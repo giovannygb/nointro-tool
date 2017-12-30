@@ -20,7 +20,8 @@ parser.add_argument(
         "status",
         "missing",
         "mispelled",
-        "rename"
+        "rename",
+        "list"
     ]
 )
 
@@ -40,7 +41,35 @@ parser.add_argument(
     required = True
 )
 
+parser.add_argument(
+    "--filters",
+    "-f",
+    default = [],
+    action = "append",
+    nargs = "+"
+)
+
 args = parser.parse_args()
+
+class RomTags(object):
+    def __init__(self, rom):
+        self.total = rom.name.count("(")
+        self.tags = self.__tag_array__(rom.name)
+
+    def __tag_array__(self, name):
+        tags = []
+        end = 0
+        for i in range(self.total):
+            start = name.find("(", end)
+            end = name.find(")", end + 1)
+            tags.extend(self.__strip_tag__(name[start + 1:end].split(",")))
+        return tags
+
+    def __strip_tag__(self, tags):
+        return [tag.strip() for tag in tags]
+
+    def __str__(self):
+        return self.tags.__str__()
 
 def load_nointro(dat_files):
     nointros = []
@@ -111,3 +140,20 @@ if args.action == "rename":
 
             print("Moving {0} to {1}".format(src_path, dst_path))
             shutil.move(src_path, dst_path)
+
+def should_filter(tags, filterss):
+    ret2 = True
+    for filters in filterss:
+        ret1 = False
+        for filter in filters:
+            if filter.startswith("!"):
+                ret1 |= not tags.__contains__(filter[1:])
+            else:
+                ret1 |= tags.__contains__(filter)
+        ret2 &= ret1
+    return ret2
+
+if args.action == "list":
+    for rom in roms:
+        if should_filter(RomTags(rom).tags, args.filters):
+            print(rom.name)
