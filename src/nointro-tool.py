@@ -141,6 +141,15 @@ if args.action == "rename":
             print("Moving {0} to {1}".format(src_path, dst_path))
             shutil.move(src_path, dst_path)
 
+def filter_roms(roms, filterss):
+    filtered_roms = []
+
+    for rom in roms:
+        if should_filter(RomTags(rom).tags, filterss):
+            filtered_roms.append(rom)
+
+    return filtered_roms
+
 def should_filter(tags, filterss):
     ret2 = True
     for filters in filterss:
@@ -154,6 +163,5 @@ def should_filter(tags, filterss):
     return ret2
 
 if args.action == "list":
-    for rom in roms:
-        if should_filter(RomTags(rom).tags, args.filters):
-            print(rom.name)
+    for rom in filter_roms(roms, args.filters):
+        print(rom.name)
