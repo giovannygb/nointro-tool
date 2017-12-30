@@ -44,6 +44,14 @@ class NoIntro(object):
         self.url = url
         self.games = games
 
+    def roms(self):
+        roms = []
+
+        for game in self.games:
+            roms.append(game.rom)
+
+        return roms
+
 class Game(object):
     def __init__(self, name, description, rom):
         self.name = name
