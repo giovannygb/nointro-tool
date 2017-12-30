@@ -16,18 +16,19 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--dat-file",
+    "--dat-files",
     "-df",
+    nargs = "+",
     type = FileType("r"),
     required = True
 )
 
 args = parser.parse_args()
 
-nointro = load(args.dat_file)
-
-if args.action == "status":
-    print("Loaded {0} games from dat file {1}".format(
-        len(nointro.games),
-        nointro.name
-    ))
+for dat_file in args.dat_files:
+    nointro = load(dat_file)
+    if args.action == "status":
+        print("Loaded {0} games from dat file {1}".format(
+            len(nointro.games),
+            nointro.name
+        ))
