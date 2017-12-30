@@ -16,8 +16,8 @@ class Rom(object):
     def __init__(self, path):
         self.path = path
         self.size = int(os.stat(path).st_size)
-        self.md5 = __load_md5__(path)
-        self.sha1 = __load_sha1__(path)
+        self.md5 = __load_md5__(path).upper()
+        self.sha1 = __load_sha1__(path).upper()
         with open(path, "rb") as file:
             self.name = os.path.basename(file.name)
             self.crc = int(zlib.crc32(file.read()))
