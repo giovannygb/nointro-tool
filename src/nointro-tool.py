@@ -13,7 +13,7 @@ parser.add_argument(
     nargs = "?",
     const = "status",
     default = "status",
-    choices = ["status", "missing"]
+    choices = ["status", "missing", "mispelled"]
 )
 
 parser.add_argument(
@@ -76,6 +76,15 @@ if args.action == "status":
     print("Loaded {0} no-intro rom file(s)".format(len(nointro_roms)))
     print("Loaded {0} rom file(s)".format(len(roms)))
     print("Missing {0} roms".format(len(nointro_rom_md5.keys() - rom_md5.keys())))
+
 if args.action == "missing":
     for missing_md5 in nointro_rom_md5.keys() - rom_md5.keys():
         print("Missing {0} rom".format(nointro_rom_md5[missing_md5].name))
+
+if args.action == "mispelled":
+    for common_md5 in nointro_rom_md5.keys() & rom_md5.keys():
+        nointro_rom = nointro_rom_md5[common_md5]
+        rom = rom_md5[common_md5]
+
+        if rom.name != nointro_rom.name:
+            print("Rom {0} should be named {1}".format(rom.name, nointro_rom.name))
