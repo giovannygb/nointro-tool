@@ -4,6 +4,9 @@ from argparse import FileType
 import nointro
 import rom
 
+import shutil
+import os
+
 parser = ArgumentParser(
     description = "A tool to organize roms no-intro style"
 )
@@ -13,7 +16,12 @@ parser.add_argument(
     nargs = "?",
     const = "status",
     default = "status",
-    choices = ["status", "missing", "mispelled"]
+    choices = [
+        "status",
+        "missing",
+        "mispelled",
+        "rename"
+    ]
 )
 
 parser.add_argument(
@@ -88,3 +96,18 @@ if args.action == "mispelled":
 
         if rom.name != nointro_rom.name:
             print("Rom {0} should be named {1}".format(rom.name, nointro_rom.name))
+
+if args.action == "rename":
+    for common_md5 in nointro_rom_md5.keys() & rom_md5.keys():
+        nointro_rom = nointro_rom_md5[common_md5]
+        rom = rom_md5[common_md5]
+
+        if rom.name != nointro_rom.name:
+            with open(rom.path) as file:
+                base_path = os.path.dirname(file.name)
+
+            src_path = rom.path
+            dst_path = os.path.join(base_path, nointro_rom.name)
+
+            print("Moving {0} to {1}".format(src_path, dst_path))
+            shutil.move(src_path, dst_path)
