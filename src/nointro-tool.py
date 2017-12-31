@@ -21,7 +21,8 @@ parser.add_argument(
         "missing",
         "mispelled",
         "rename",
-        "list"
+        "list",
+        "copy"
     ]
 )
 
@@ -38,6 +39,11 @@ parser.add_argument(
     "-rf",
     nargs = "+",
     required = True
+)
+
+parser.add_argument(
+    "--target-dir",
+    "-td"
 )
 
 parser.add_argument(
@@ -192,3 +198,18 @@ if args.action == "list":
 
     for rom in roms:
         print(rom.name)
+
+if args.action == "copy":
+    roms = filter_roms(roms, args.filters)
+
+    if (args.unique):
+        roms = unique_filter(roms)
+
+    if (args.target_dir != None):
+        for rom in roms:
+            with open(rom.path) as file:
+                base_path = os.path.dirname(file.name)
+
+            src_path = rom.path
+            dst_path = os.path.join(args.target_dir, rom.name)
+            shutil.copy(src_path, dst_path)
