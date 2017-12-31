@@ -33,7 +33,6 @@ parser.add_argument(
     required = True
 )
 
-
 parser.add_argument(
     "--rom-folders",
     "-rf",
@@ -47,6 +46,11 @@ parser.add_argument(
     default = [],
     action = "append",
     nargs = "+"
+)
+
+parser.add_argument(
+    "--unique",
+    action = "store_true"
 )
 
 args = parser.parse_args()
@@ -70,6 +74,14 @@ class RomTags(object):
 
     def __str__(self):
         return self.tags.__str__()
+
+class RomCleanName(object):
+    def __init__(self, rom):
+        idx = rom.name.find("(")
+        self.name = rom.name[:idx - 1]
+
+    def __str__(self):
+        return self.name
 
 def load_nointro(dat_files):
     nointros = []
@@ -162,6 +174,21 @@ def should_filter(tags, filterss):
         ret2 &= ret1
     return ret2
 
+def unique_filter(roms):
+    unique_names = []
+    unique_roms = []
+    for rom in roms:
+        unique_name = RomCleanName(rom).name
+        if unique_name not in unique_names:
+            unique_names.append(unique_name)
+            unique_roms.append(rom)
+    return unique_roms
+
 if args.action == "list":
-    for rom in filter_roms(roms, args.filters):
+    roms = filter_roms(roms, args.filters)
+
+    if (args.unique):
+        roms = unique_filter(roms)
+
+    for rom in roms:
         print(rom.name)
