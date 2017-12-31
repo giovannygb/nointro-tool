@@ -121,8 +121,50 @@ def load_md5_dict(roms):
 
     return md5_dict
 
+def filter_roms(roms, filterss):
+    filtered_roms = []
+
+    for rom in roms:
+        if should_filter(RomTags(rom).tags, filterss):
+            filtered_roms.append(rom)
+
+    return filtered_roms
+
+def should_filter(tags, filterss):
+    ret2 = True
+    for filters in filterss:
+        ret1 = False
+        for filter in filters:
+            if filter.startswith("!"):
+                ret1 |= not tags.__contains__(filter[1:])
+            else:
+                ret1 |= tags.__contains__(filter)
+        ret2 &= ret1
+    return ret2
+
+def unique_filter(roms):
+    unique_names = []
+    unique_roms = []
+    for rom in roms:
+        unique_name = RomCleanName(rom).name
+        if unique_name not in unique_names:
+            unique_names.append(unique_name)
+            unique_roms.append(rom)
+    return unique_roms
+
 nointro_roms = load_nointro_roms(args.dat_files)
 roms = load_roms(args.rom_folders)
+
+
+nointro_roms = filter_roms(nointro_roms, args.filters)
+
+if (args.unique):
+    nointro_roms = unique_filter(nointro_roms)
+
+roms = filter_roms(roms, args.filters)
+
+if (args.unique):
+    roms = unique_filter(roms)
 
 nointro_rom_md5 = load_md5_dict(nointro_roms)
 rom_md5 = load_md5_dict(roms)
@@ -159,52 +201,11 @@ if args.action == "rename":
             print("Moving {0} to {1}".format(src_path, dst_path))
             shutil.move(src_path, dst_path)
 
-def filter_roms(roms, filterss):
-    filtered_roms = []
-
-    for rom in roms:
-        if should_filter(RomTags(rom).tags, filterss):
-            filtered_roms.append(rom)
-
-    return filtered_roms
-
-def should_filter(tags, filterss):
-    ret2 = True
-    for filters in filterss:
-        ret1 = False
-        for filter in filters:
-            if filter.startswith("!"):
-                ret1 |= not tags.__contains__(filter[1:])
-            else:
-                ret1 |= tags.__contains__(filter)
-        ret2 &= ret1
-    return ret2
-
-def unique_filter(roms):
-    unique_names = []
-    unique_roms = []
-    for rom in roms:
-        unique_name = RomCleanName(rom).name
-        if unique_name not in unique_names:
-            unique_names.append(unique_name)
-            unique_roms.append(rom)
-    return unique_roms
-
 if args.action == "list":
-    roms = filter_roms(roms, args.filters)
-
-    if (args.unique):
-        roms = unique_filter(roms)
-
     for rom in roms:
         print(rom.name)
 
 if args.action == "copy":
-    roms = filter_roms(roms, args.filters)
-
-    if (args.unique):
-        roms = unique_filter(roms)
-
     if (args.target_dir != None):
         for rom in roms:
             with open(rom.path) as file:
