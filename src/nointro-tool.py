@@ -3,6 +3,7 @@ from argparse import FileType
 
 import nointro
 import rom
+import tools
 
 import shutil
 import os
@@ -89,30 +90,6 @@ class RomCleanName(object):
     def __str__(self):
         return self.name
 
-def load_nointro(dat_files):
-    nointros = []
-
-    for dat_file in dat_files:
-        nointros.append(nointro.load(dat_file))
-
-    return nointros
-
-def load_nointro_roms(dat_files):
-    nointro_roms = []
-
-    for nointro in load_nointro(dat_files):
-        nointro_roms.extend(nointro.roms())
-
-    return nointro_roms
-
-def load_roms(rom_folders):
-    roms = []
-
-    for rom_folder in rom_folders:
-        roms.extend(rom.load(rom_folder))
-
-    return roms
-
 def load_md5_dict(roms):
     md5_dict = {}
 
@@ -152,9 +129,8 @@ def unique_filter(roms):
             unique_roms.append(rom)
     return unique_roms
 
-nointro_roms = load_nointro_roms(args.dat_files)
-roms = load_roms(args.rom_folders)
-
+nointro_roms = tools.load_nointro_roms(args.dat_files)
+roms = tools.load_roms(args.rom_folders)
 
 nointro_roms = filter_roms(nointro_roms, args.filters)
 
