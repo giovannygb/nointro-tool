@@ -83,11 +83,39 @@ def should_filter(tags, filterss):
     return ret2
 
 def unique_filter(roms):
-    unique_names = []
-    unique_roms = []
+    unique_dict = {}
     for rom in roms:
         unique_name = RomCleanName(rom).name
-        if unique_name not in unique_names:
-            unique_names.append(unique_name)
-            unique_roms.append(rom)
-    return unique_roms
+        if unique_name in unique_dict:
+            if unique_should_replace(unique_dict[unique_name], rom):
+                unique_dict[unique_name] = rom
+        else:
+            unique_dict[unique_name] = rom
+    return list(unique_dict.values())
+
+def unique_should_replace(current_rom, new_rom):
+    current_tags = RomTags(current_rom).tags
+    new_tags = RomTags(new_rom).tags
+
+    current_revision = get_revision(current_tags)
+    new_revision = get_revision(new_tags)
+
+    if get_revision_priority(new_revision) == get_revision_priority(current_revision):
+        return new_revision > current_revision
+    return get_revision_priority(new_revision) > get_revision_priority(current_revision)
+
+def get_revision(tags):
+    for tag in tags:
+        if tag.startswith("Sample"): return tag
+        if tag.startswith("Rev"): return tag
+        if tag.startswith("Proto"): return tag
+        if tag.startswith("Beta"): return tag
+        if tag.startswith("Arcade"): return tag
+    return ""
+
+def get_revision_priority(revision):
+    if revision.startswith("Sample"): return 0
+    if revision.startswith("Beta"): return 1
+    if revision.startswith("Proto"): return 2
+    if revision.startswith("Arcade"): return 3
+    return 4
