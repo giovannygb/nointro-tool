@@ -23,7 +23,8 @@ parser.add_argument(
         "mispelled",
         "rename",
         "list",
-        "copy"
+        "copy",
+        "mishash"
     ]
 )
 
@@ -123,3 +124,8 @@ if args.action == "copy":
             src_path = rom.path
             dst_path = os.path.join(args.target_dir, rom.name)
             shutil.copy(src_path, dst_path)
+
+if args.action == "mishash":
+    for mishashed_md5 in rom_md5.keys() - nointro_rom_md5.keys():
+        rom = rom_md5[mishashed_md5]
+        print("Rom {0} should be deleted".format(rom.name))
