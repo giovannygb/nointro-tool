@@ -20,7 +20,7 @@ parser.add_argument(
     choices = [
         "status",
         "missing",
-        "mispelled",
+        "misspelled",
         "rename",
         "list",
         "copy",
@@ -88,7 +88,7 @@ if args.action == "missing":
     for missing_md5 in nointro_rom_md5.keys() - rom_md5.keys():
         print("Missing {0} rom".format(nointro_rom_md5[missing_md5].name))
 
-if args.action == "mispelled":
+if args.action == "misspelled":
     for common_md5 in nointro_rom_md5.keys() & rom_md5.keys():
         nointro_rom = nointro_rom_md5[common_md5]
         rom = rom_md5[common_md5]
